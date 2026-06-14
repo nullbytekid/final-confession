@@ -99,6 +99,12 @@ from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 ```
 
+**Note:** `settings.py` loads `backend/.env` by absolute path. If you still see `Invalid HTTP_HOST` before pulling the latest code, add this line in the WSGI file *before* `get_wsgi_application()`:
+
+```python
+os.environ.setdefault('DJANGO_ALLOWED_HOSTS', 'yourusername.pythonanywhere.com')
+```
+
 **Virtualenv:** `/home/yourusername/confession/backend/venv`
 
 Click **Reload** after changes.

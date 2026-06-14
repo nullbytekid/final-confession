@@ -2,9 +2,9 @@ import os
 
 from dotenv import load_dotenv
 
-load_dotenv()
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY", "dev-only-change-me-in-production"
