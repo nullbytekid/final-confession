@@ -12,7 +12,7 @@ urlpatterns = [
         name="frontend_next",
     ),
     re_path(
-        r"^(?P<path>.*)$",
+        r"^(?!(?:admin|api)(?:/|$))(?P<path>.*)$",
         frontend_views.serve_frontend_page,
         name="frontend",
     ),

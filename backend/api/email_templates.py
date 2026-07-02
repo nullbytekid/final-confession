@@ -73,3 +73,36 @@ def opened_email_html() -> str:
         <p>The journey has begun... ✨</p>
         """,
     )
+
+
+def _escape(text: str) -> str:
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def wheresa_wellness_email_html(message: str) -> str:
+    safe_message = _escape(message)
+    return _wrap(
+        "💕 Kasandra's wellness check-in",
+        f"""
+        <span class="emoji">🥺💕</span>
+        <p>Kasandra answered on <span class="highlight">"My dearest Kasandra..."</span></p>
+        <div class="reason-box"><p>"{safe_message}"</p></div>
+        <p>She shared how she's doing — take a moment to read her words. 💌</p>
+        """,
+    )
+
+
+def wheresa_date_confirm_email_html(message: str) -> str:
+    safe_message = _escape(message)
+    return _wrap(
+        "💖 Kasandra said YES to Claveria!",
+        f"""
+        <span class="emoji">🗺️💕</span>
+        <p>Kasandra said <span class="highlight">YES</span> to your date invite!</p>
+        <p><strong>WHO:</strong> MARLON AND KASANDRA<br>
+        <strong>WHERE:</strong> PROVINCE OF CLAVERIA<br>
+        <strong>WHEN:</strong> Saturday, June 4, 2026 at 2:00 PM</p>
+        <p>Her message to you:</p>
+        <div class="reason-box"><p>"{safe_message}"</p></div>
+        """,
+    )

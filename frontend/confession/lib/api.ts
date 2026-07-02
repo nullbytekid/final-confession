@@ -87,6 +87,42 @@ export async function sendYes(): Promise<{
   }
 }
 
+export async function submitWheresaWellness(
+  message: string
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch(`${API_URL}/api/wheresa/wellness/`, {
+      ...fetchOpts,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
+    });
+    if (res.ok) return { ok: true };
+    const data = await res.json().catch(() => ({}));
+    return { ok: false, error: data.detail || "Could not send message" };
+  } catch {
+    return { ok: false, error: "Could not reach server" };
+  }
+}
+
+export async function submitWheresaDateConfirm(
+  message: string
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch(`${API_URL}/api/wheresa/date-confirm/`, {
+      ...fetchOpts,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
+    });
+    if (res.ok) return { ok: true };
+    const data = await res.json().catch(() => ({}));
+    return { ok: false, error: data.detail || "Could not send response" };
+  } catch {
+    return { ok: false, error: "Could not reach server" };
+  }
+}
+
 export async function stopCourting(
   reason: string
 ): Promise<{ ok: boolean; error?: string }> {

@@ -10,10 +10,17 @@ from .email_templates import (
     opened_email_html,
     stop_courting_kasandra_html,
     stop_courting_marlon_html,
+    wheresa_date_confirm_email_html,
+    wheresa_wellness_email_html,
     yes_email_html,
 )
 from .models import SiteConfig
-from .serializers import PasswordSerializer, ResponseSerializer, StopCourtingSerializer
+from .serializers import (
+    PasswordSerializer,
+    ResponseSerializer,
+    StopCourtingSerializer,
+    WheresaMessageSerializer,
+)
 
 
 def _is_authenticated(request) -> bool:
@@ -179,4 +186,48 @@ def stop_courting(request):
         to_email=settings.KASANDRA_EMAIL,
     )
 
+    return Response({"status": "ok"}, status=status.HTTP_200_OK)
+
+
+@csrf_exempt
+@api_view(["POST"])
+def wheresa_wellness(request):
+    serializer = WheresaMessageSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    message = serializer.validated_data["message"]
+    sent = send_email(
+        "💕 Kasandra's wellness check-in (Wheresa)",
+        wheresa_wellness_email_html(message),
+        text_content=f"Kasandra's wellness answer: {message}",
+        to_email=settings.MARLON_EMAIL,
+    )
+    if not sent:
+        return Response(
+            {"detail": "Email could not be sent. Check Brevo settings and try again."},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+    return Response({"status": "ok"}, status=status.HTTP_200_OK)
+
+
+@csrf_exempt
+@api_view(["POST"])
+def wheresa_date_confirm(request):
+    serializer = WheresaMessageSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    message = serializer.validated_data["message"]
+    sent = send_email(
+        "💖 Kasandra said YES to Claveria! (Wheresa)",
+        wheresa_date_confirm_email_html(message),
+        text_content=f"Kasandra said YES to the Claveria date. Her message: {message}",
+        to_email=settings.MARLON_EMAIL,
+    )
+    if not sent:
+        return Response(
+            {"detail": "Email could not be sent. Check Brevo settings and try again."},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
     return Response({"status": "ok"}, status=status.HTTP_200_OK)

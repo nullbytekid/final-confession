@@ -11,3 +11,7 @@ class PasswordSerializer(serializers.Serializer):
 
 class StopCourtingSerializer(serializers.Serializer):
     reason = serializers.CharField(min_length=1, max_length=2000)
+
+
+class WheresaMessageSerializer(serializers.Serializer):
+    message = serializers.CharField(min_length=1, max_length=2000)

@@ -374,3 +374,50 @@
 body {
   overflow-x: hidden;
 }
+
+/* ── Wheresa page ── */
+.wheresa-bg {
+  background: url("/picture/backgroundgif.gif") center center / cover no-repeat fixed;
+}
+
+.wheresa-overlay {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 240, 245, 0.82) 0%,
+    rgba(255, 214, 224, 0.78) 40%,
+    rgba(255, 182, 201, 0.75) 100%
+  );
+  min-height: 100vh;
+}
+
+.wheresa-card {
+  background: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 8px 40px rgba(255, 105, 180, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.wheresa-input {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 143, 171, 0.45);
+  outline: none;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.wheresa-input:focus {
+  border-color: rgba(255, 105, 180, 0.7);
+  box-shadow: 0 0 0 3px rgba(255, 182, 201, 0.45);
+}
+
+.lightbox-overlay {
+  background: rgba(30, 10, 20, 0.75);
+  backdrop-filter: blur(6px);
+  animation: fadeInLine 0.3s ease-out both;
+}
+
+.lightbox-content {
+  animation: pageEnter 0.4s ease-out both;
+}
