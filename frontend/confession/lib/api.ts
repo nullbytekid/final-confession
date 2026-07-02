@@ -5,6 +5,22 @@ const fetchOpts: RequestInit = {
   credentials: "include",
 };
 
+function parseApiError(
+  data: unknown,
+  status: number,
+  fallback: string
+): string {
+  if (data && typeof data === "object") {
+    const record = data as Record<string, unknown>;
+    if (typeof record.detail === "string") return record.detail;
+    if (Array.isArray(record.message) && record.message[0]) {
+      return String(record.message[0]);
+    }
+    if (typeof record.message === "string") return record.message;
+  }
+  return `${fallback} (error ${status})`;
+}
+
 export interface SiteStatus {
   password_set: boolean;
   authenticated: boolean;
@@ -92,14 +108,16 @@ export async function submitWheresaWellness(
 ): Promise<{ ok: boolean; error?: string }> {
   try {
     const res = await fetch(`${API_URL}/api/wheresa/wellness/`, {
-      ...fetchOpts,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message }),
     });
     if (res.ok) return { ok: true };
     const data = await res.json().catch(() => ({}));
-    return { ok: false, error: data.detail || "Could not send message" };
+    return {
+      ok: false,
+      error: parseApiError(data, res.status, "Could not send message"),
+    };
   } catch {
     return { ok: false, error: "Could not reach server" };
   }
@@ -110,14 +128,16 @@ export async function submitWheresaDateConfirm(
 ): Promise<{ ok: boolean; error?: string }> {
   try {
     const res = await fetch(`${API_URL}/api/wheresa/date-confirm/`, {
-      ...fetchOpts,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message }),
     });
     if (res.ok) return { ok: true };
     const data = await res.json().catch(() => ({}));
-    return { ok: false, error: data.detail || "Could not send response" };
+    return {
+      ok: false,
+      error: parseApiError(data, res.status, "Could not send response"),
+    };
   } catch {
     return { ok: false, error: "Could not reach server" };
   }

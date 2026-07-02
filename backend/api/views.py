@@ -2,7 +2,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 
 from .email_service import send_email
@@ -189,12 +189,15 @@ def stop_courting(request):
     return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
 
-@csrf_exempt
 @api_view(["POST"])
+@authentication_classes([])
+@permission_classes([])
 def wheresa_wellness(request):
     serializer = WheresaMessageSerializer(data=request.data)
     if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        message_errors = serializer.errors.get("message")
+        detail = message_errors[0] if message_errors else "Invalid message"
+        return Response({"detail": str(detail)}, status=status.HTTP_400_BAD_REQUEST)
 
     message = serializer.validated_data["message"]
     sent = send_email(
@@ -205,18 +208,26 @@ def wheresa_wellness(request):
     )
     if not sent:
         return Response(
-            {"detail": "Email could not be sent. Check Brevo settings and try again."},
+            {
+                "detail": (
+                    "Email could not be sent. On PythonAnywhere, check backend/.env "
+                    "(BREVO_API_KEY must start with xkeysib-) and reload the web app."
+                )
+            },
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
     return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
 
-@csrf_exempt
 @api_view(["POST"])
+@authentication_classes([])
+@permission_classes([])
 def wheresa_date_confirm(request):
     serializer = WheresaMessageSerializer(data=request.data)
     if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        message_errors = serializer.errors.get("message")
+        detail = message_errors[0] if message_errors else "Invalid message"
+        return Response({"detail": str(detail)}, status=status.HTTP_400_BAD_REQUEST)
 
     message = serializer.validated_data["message"]
     sent = send_email(
@@ -227,7 +238,12 @@ def wheresa_date_confirm(request):
     )
     if not sent:
         return Response(
-            {"detail": "Email could not be sent. Check Brevo settings and try again."},
+            {
+                "detail": (
+                    "Email could not be sent. On PythonAnywhere, check backend/.env "
+                    "(BREVO_API_KEY must start with xkeysib-) and reload the web app."
+                )
+            },
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
     return Response({"status": "ok"}, status=status.HTTP_200_OK)
