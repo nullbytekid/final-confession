@@ -2,7 +2,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .email_service import send_email
@@ -189,9 +189,8 @@ def stop_courting(request):
     return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
 
+@csrf_exempt
 @api_view(["POST"])
-@authentication_classes([])
-@permission_classes([])
 def wheresa_wellness(request):
     serializer = WheresaMessageSerializer(data=request.data)
     if not serializer.is_valid():
@@ -219,9 +218,8 @@ def wheresa_wellness(request):
     return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
 
+@csrf_exempt
 @api_view(["POST"])
-@authentication_classes([])
-@permission_classes([])
 def wheresa_date_confirm(request):
     serializer = WheresaMessageSerializer(data=request.data)
     if not serializer.is_valid():
