@@ -30,5 +30,16 @@ if (Test-Path $DestDir) {
 New-Item -ItemType Directory -Path $DestDir | Out-Null
 Copy-Item -Path (Join-Path $OutDir "*") -Destination $DestDir -Recurse
 
+$ZipPath = Join-Path $Root "backend\frontend_dist.zip"
+Write-Host "Creating backend\frontend_dist.zip for deploy..."
+if (Test-Path $ZipPath) {
+    Remove-Item $ZipPath -Force
+}
+Push-Location (Join-Path $Root "backend")
+tar -a -cf frontend_dist.zip frontend_dist
+Pop-Location
+
 Write-Host "Done! Start Django: cd backend && py manage.py runserver"
 Write-Host "Open http://127.0.0.1:8000/"
+Write-Host "Deploy: git add backend/frontend_dist.zip && git commit && git push"
+Write-Host "On PythonAnywhere: cd backend && rm -rf frontend_dist && unzip -o frontend_dist.zip"
