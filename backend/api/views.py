@@ -1,6 +1,10 @@
+import json
+
 from django.conf import settings
+from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -19,7 +23,6 @@ from .serializers import (
     PasswordSerializer,
     ResponseSerializer,
     StopCourtingSerializer,
-    WheresaMessageSerializer,
 )
 
 
@@ -190,15 +193,19 @@ def stop_courting(request):
 
 
 @csrf_exempt
-@api_view(["POST"])
+@require_POST
 def wheresa_wellness(request):
-    serializer = WheresaMessageSerializer(data=request.data)
-    if not serializer.is_valid():
-        message_errors = serializer.errors.get("message")
-        detail = message_errors[0] if message_errors else "Invalid message"
-        return Response({"detail": str(detail)}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({"detail": "Invalid JSON"}, status=400)
 
-    message = serializer.validated_data["message"]
+    message = str(payload.get("message", "")).strip()
+    if not message:
+        return JsonResponse({"detail": "Message is required"}, status=400)
+    if len(message) > 2000:
+        return JsonResponse({"detail": "Message is too long"}, status=400)
+
     sent = send_email(
         "💕 Kasandra's wellness check-in (Wheresa)",
         wheresa_wellness_email_html(message),
@@ -206,28 +213,32 @@ def wheresa_wellness(request):
         to_email=settings.MARLON_EMAIL,
     )
     if not sent:
-        return Response(
+        return JsonResponse(
             {
                 "detail": (
                     "Email could not be sent. On PythonAnywhere, check backend/.env "
                     "(BREVO_API_KEY must start with xkeysib-) and reload the web app."
                 )
             },
-            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            status=503,
         )
-    return Response({"status": "ok"}, status=status.HTTP_200_OK)
+    return JsonResponse({"status": "ok"})
 
 
 @csrf_exempt
-@api_view(["POST"])
+@require_POST
 def wheresa_date_confirm(request):
-    serializer = WheresaMessageSerializer(data=request.data)
-    if not serializer.is_valid():
-        message_errors = serializer.errors.get("message")
-        detail = message_errors[0] if message_errors else "Invalid message"
-        return Response({"detail": str(detail)}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({"detail": "Invalid JSON"}, status=400)
 
-    message = serializer.validated_data["message"]
+    message = str(payload.get("message", "")).strip()
+    if not message:
+        return JsonResponse({"detail": "Message is required"}, status=400)
+    if len(message) > 2000:
+        return JsonResponse({"detail": "Message is too long"}, status=400)
+
     sent = send_email(
         "💖 Kasandra said YES to Claveria! (Wheresa)",
         wheresa_date_confirm_email_html(message),
@@ -235,13 +246,13 @@ def wheresa_date_confirm(request):
         to_email=settings.MARLON_EMAIL,
     )
     if not sent:
-        return Response(
+        return JsonResponse(
             {
                 "detail": (
                     "Email could not be sent. On PythonAnywhere, check backend/.env "
                     "(BREVO_API_KEY must start with xkeysib-) and reload the web app."
                 )
             },
-            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            status=503,
         )
-    return Response({"status": "ok"}, status=status.HTTP_200_OK)
+    return JsonResponse({"status": "ok"})

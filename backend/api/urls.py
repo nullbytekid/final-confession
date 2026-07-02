@@ -10,10 +10,6 @@ urlpatterns = [
     path("opened/", csrf_exempt(views.opened), name="opened"),
     path("respond/", csrf_exempt(views.respond), name="respond"),
     path("stop-courting/", csrf_exempt(views.stop_courting), name="stop_courting"),
-    path("wheresa/wellness/", csrf_exempt(views.wheresa_wellness), name="wheresa_wellness"),
-    path(
-        "wheresa/date-confirm/",
-        csrf_exempt(views.wheresa_date_confirm),
-        name="wheresa_date_confirm",
-    ),
+    path("wheresa/wellness/", views.wheresa_wellness, name="wheresa_wellness"),
+    path("wheresa/date-confirm/", views.wheresa_date_confirm, name="wheresa_date_confirm"),
 ]
